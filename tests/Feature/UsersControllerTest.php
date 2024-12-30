@@ -3,6 +3,7 @@
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
+use App\Models\Author;
 
 it("has authorization check", function () {
     $response = $this->withHeaders(["Accept" => "application/json"])->get("/api/authors");
@@ -30,24 +31,55 @@ it("returns success http status code", function () {
 });
 
 it("shows list of clients without pagination", function () {
-    $response = $this->get('/api/clients'); 
+    $user = new App\Models\User();
+    $user->name = 'test_user';
+    $user->email = 'test_email';
+    $user->password = bcrypt('password');
+    $user->save();
 
-    $response->assertJson('
-        {
-            "data": {
-            "returnType": "collection",
-            "paginate": false,
-            "result": [
-                {
-                    "id": 1,
-                    "name": "Ali"
-                },
-                {
-                    "id": 1,
-                    "name": "Ali"
-                }
-            ]
-            }
-        }
-    ');
+    $token = $user->createToken("test_token");
+
+    $authorNames = ["autorh1", "author2"];
+    $authors = [];
+
+    foreach($authorNames as $authorName) {
+        $author = new Author();
+        $author->name = $authorName;
+        $author->save();
+
+        $authors[] = $author;
+    }
+
+    $result = [];
+    foreach ($authors as $author) {
+        $result[] = [
+            "id" => $author->id,
+            "name" => $author->name,
+        ];
+    }
+
+    $responseToAssert = [
+        "data" => [
+            "returnType" => "collection",
+            "paginate" => false,
+            "result" => $result,
+        ]
+    ];
+
+    // $responseToAssert = json_encode($responseToAssert);
+    
+    $response = $this
+    ->withHeaders([
+        "Authorization" => "Bearer " . $token->plainTextToken,
+        "Accept" => "application/json",
+    ])
+    ->get('/api/authors'); 
+
+    // dd($responseToAssert);
+    // dd($response->json(), $responseToAssert);
+    expect($response->json())->toEqual($responseToAssert);
+
+
+
+    // $response->assertJson($responseToAssert);
 });
