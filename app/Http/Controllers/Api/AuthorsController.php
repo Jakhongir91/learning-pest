@@ -9,6 +9,6 @@ class AuthorsController extends Controller
 {
     public function index()
     {
-        return response()->noContent();
+        return response()->json(["data" => "success"]);
     }
 }

@@ -11,17 +11,19 @@ it("has authorization check", function () {
 });
 
 it("returns success http status code", function () {
-    $user = new User();
+    $user = new App\Models\User();
     $user->name = 'test_user';
     $user->email = 'test_email';
     $user->password = bcrypt('password');
     $user->save();
 
     $token = $user->createToken("test_token");
-    // Au
-    $response = $this->withHeaders(["Authorization" => "Bearer " . $token->plainTextToken])
-                     ->get('/api/authors');
 
+    $response = $this->withHeaders([
+        "Authorization" => "Bearer " . $token->plainTextToken,
+        "Accept" => "application/json",
+    ])
+                     ->get('/api/authors');
     $response = $this->get('/api/authors');
 
     $response->assertStatus(200);
