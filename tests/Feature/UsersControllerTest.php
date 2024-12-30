@@ -65,8 +65,6 @@ it("shows list of clients without pagination", function () {
             "result" => $result,
         ]
     ];
-
-    // $responseToAssert = json_encode($responseToAssert);
     
     $response = $this
     ->withHeaders([
@@ -75,11 +73,5 @@ it("shows list of clients without pagination", function () {
     ])
     ->get('/api/authors'); 
 
-    // dd($responseToAssert);
-    // dd($response->json(), $responseToAssert);
     expect($response->json())->toEqual($responseToAssert);
-
-
-
-    // $response->assertJson($responseToAssert);
 });
